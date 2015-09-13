@@ -8,18 +8,21 @@ openwrt_feeds = libevent2 luci luci-app-samba xl2tpd pptpd pdnsd ntfs-3g ethtool
 
 CONFIG_FILENAME = config-hiwifi-hcxxxx
 
+define CheckConfigSymlink
+	@if ! [ -e $(CONFIG_FILENAME) ]; then \
+		echo "*** Please make a symbolic of either config file to '$(CONFIG_FILENAME)'."; \
+		exit 1; \
+	 fi
+endef
+
 HC5X61: .install_feeds
 	@cd $(openwrt_dir); \
 		if [ -e .config ]; then \
 			mv -vf .config .config.bak; \
 			echo "WARNING: .config is updated, backed up as '.config.bak'"; \
 		fi
-	@if [ -e $(CONFIG_FILENAME) ]; then \
-		cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config; \
-	 else \
-		echo "*** Please make a symbolic of either config file to '$(CONFIG_FILENAME)'."; \
-		exit 1; \
-	 fi
+	$(call CheckConfigSymlink)
+	cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config
 	@[ -f .config.extra ] && cat .config.extra >> $(openwrt_dir)/.config || :
 	make -C $(openwrt_dir) V=s -j4
 
@@ -39,6 +42,7 @@ recovery.bin: HC5X61
 
 .patched: .checkout_svn
 	@cd $(openwrt_dir); cat ../patches/*.patch | patch -p0
+	$(call CheckConfigSymlink)
 	@cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config
 	@touch .patched
 
@@ -64,6 +68,7 @@ recovery.bin: HC5X61
 
 menuconfig: .install_feeds
 	@cd $(openwrt_dir); [ -f .config ] && mv -vf .config .config.bak || :
+	$(call CheckConfigSymlink)
 	@cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config
 	@touch $(CONFIG_FILENAME)  # change modification time
 	@make -C $(openwrt_dir) menuconfig
