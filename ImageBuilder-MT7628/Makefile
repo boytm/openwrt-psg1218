@@ -1,6 +1,6 @@
 
-BUILDER ?= OpenWrt-ImageBuilder-15.05-rc2-ramips-mt7628.Linux-x86_64
-SDK ?= OpenWrt-SDK-15.05-rc2-ramips-mt7628_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
+BUILDER ?= OpenWrt-ImageBuilder-15.05-ramips-mt7628.Linux-x86_64
+SDK ?= OpenWrt-SDK-15.05-ramips-mt7628_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
 
 OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6tables-mod-nat \
 	ipset iptables-mod-conntrack-extra iptables-mod-extra iptables-mod-ipopt iwinfo \
@@ -25,15 +25,16 @@ PREPARED_TARGETS = .check_ib .patched
 ifeq ($(FULL),1)
 	RALINK := 1
 	FEEDS := 1
+	WIFI := 1
 endif
 # Check each option for selection of packages and dependencies
 ifeq ($(RALINK),1)
-	OPKG_PACKAGES_HC5661A += 8021xd uci2dat kmod-mt7610e
+	OPKG_PACKAGES_HC5661A += 8021xd uci2dat kmod-mt7610e luci-mtk-wifi
 	PREPARED_TARGETS += .check_sdk .ralink
 endif
 ifeq ($(FEEDS),1)
 	OPKG_PACKAGES += ipset-lists minivtun shadowsocks-libev shadowsocks-tools dnsmasq-full \
-		file-storage kmod-proto-bridge kmod-yavlan
+		file-storage dnspod-utils kmod-proto-bridge kmod-yavlan
 	PREPARED_TARGETS += .check_sdk .feeds
 endif
 
@@ -46,11 +47,17 @@ define BeforeBuildImage
 	cp -f opkg.conf $(BUILDER)/target/linux/ramips/base-files/etc/opkg.conf
 endef
 
+define EnableWireless
+	@[ -n "$(WIFI)" ] || exit 0; \
+		F="$(1)"; openwrt-repack.sh $$F -w -o $$F.out && mv $$F.out $$F
+endef
+
 HC5661A: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
 	make -C $(BUILDER) image PROFILE=HiWiFi-HC5661A \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
 		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5661A)"
+	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt*-ramips-*-hc5661a-*-sysupgrade.bin))
 
 .patched:
 	cat ../patches/01-hiwifi-hc5x61.patch ../patches/12-disable-pdnsd.patch > .patching
@@ -64,6 +71,7 @@ HC5661A: $(PREPARED_TARGETS)
 	make package/uci2dat/compile V=s -C "$(SDK)"
 	make package/mt7610e/compile V=s -C "$(SDK)"
 	make package/mt76x2e/compile V=s -C "$(SDK)"
+	make package/luci-mtk-wifi/compile V=s -C "$(SDK)"
 	cd "$(SDK)/bin/ramips/packages" && ../../../scripts/ipkg-make-index.sh . > Packages && gzip -9c Packages > Packages.gz
 
 .feeds:

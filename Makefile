@@ -37,7 +37,7 @@ recovery.bin: HC5761
 
 # 2. Checkout source code:
 .checkout_svn: .check_hostdeps
-	svn co svn://svn.openwrt.org/openwrt/branches/chaos_calmer $(openwrt_dir) -r45974
+	svn co svn://svn.openwrt.org/openwrt/branches/chaos_calmer $(openwrt_dir) -r46893
 	@[ -d /var/dl ] && ln -sf /var/dl $(openwrt_dir)/dl || :
 	@touch .checkout_svn
 

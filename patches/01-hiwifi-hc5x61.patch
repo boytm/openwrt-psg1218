@@ -1,8 +1,8 @@
 Index: target/linux/ramips/image/Makefile
 ===================================================================
---- target/linux/ramips/image/Makefile	(revision 45974)
+--- target/linux/ramips/image/Makefile	(revision 46893)
 +++ target/linux/ramips/image/Makefile	(working copy)
-@@ -864,6 +864,9 @@
+@@ -866,6 +866,9 @@
  na930_mtd_size=20971520
  Image/Build/Profile/NA930=$(call BuildFirmware/CustomFlash/$(1),$(1),na930,NA930,$(na930_mtd_size))
  Image/Build/Profile/MZK-750DHP=$(call BuildFirmware/Default8M/$(1),$(1),mzk-750dhp,MZK-750DHP)
@@ -12,7 +12,7 @@ Index: target/linux/ramips/image/Makefile
  Image/Build/Profile/Y1=$(call BuildFirmware/Default16M/$(1),$(1),Lenovo-y1,Y1)
  Image/Build/Profile/Y1S=$(call BuildFirmware/Default16M/$(1),$(1),Lenovo-y1s,Y1S)
  Image/Build/Profile/MLW221=$(call BuildFirmware/Default16M/$(1),$(1),mlw221,MLW221)
-@@ -897,6 +900,9 @@
+@@ -899,6 +902,9 @@
  	$(call Image/Build/Profile/WHR1166D,$(1))
  	$(call Image/Build/Profile/MZK-750DHP,$(1))
  	$(call Image/Build/Profile/NA930,$(1))
@@ -555,9 +555,9 @@ Index: target/linux/ramips/mt7628/profiles/HiWiFi-HC5661A.mk
 +$(eval $(call Profile,HiWiFi-HC5661A))
 Index: target/linux/ramips/base-files/lib/ramips.sh
 ===================================================================
---- target/linux/ramips/base-files/lib/ramips.sh	(revision 45974)
+--- target/linux/ramips/base-files/lib/ramips.sh	(revision 46893)
 +++ target/linux/ramips/base-files/lib/ramips.sh	(working copy)
-@@ -397,6 +397,15 @@
+@@ -406,6 +406,15 @@
  	*"ZTE Q7")
  		name="zte-q7"
  		;;
@@ -575,9 +575,9 @@ Index: target/linux/ramips/base-files/lib/ramips.sh
  		;;
 Index: target/linux/ramips/base-files/lib/upgrade/platform.sh
 ===================================================================
---- target/linux/ramips/base-files/lib/upgrade/platform.sh	(revision 45974)
+--- target/linux/ramips/base-files/lib/upgrade/platform.sh	(revision 46893)
 +++ target/linux/ramips/base-files/lib/upgrade/platform.sh	(working copy)
-@@ -118,6 +118,7 @@
+@@ -121,6 +121,7 @@
  	x5 |\
  	x8 |\
  	xiaomi-miwifi-mini |\
@@ -587,9 +587,9 @@ Index: target/linux/ramips/base-files/lib/upgrade/platform.sh
  	zte-q7 |\
 Index: target/linux/ramips/base-files/etc/board.d/01_leds
 ===================================================================
---- target/linux/ramips/base-files/etc/board.d/01_leds	(revision 45974)
+--- target/linux/ramips/base-files/etc/board.d/01_leds	(revision 46893)
 +++ target/linux/ramips/base-files/etc/board.d/01_leds	(working copy)
-@@ -230,6 +230,19 @@
+@@ -243,6 +243,19 @@
  		set_usb_led "wr8305rt:usb"
  		set_wifi_led "wr8305rt:wifi"
  		;;
@@ -611,9 +611,9 @@ Index: target/linux/ramips/base-files/etc/board.d/01_leds
  		;;
 Index: target/linux/ramips/base-files/etc/board.d/02_network
 ===================================================================
---- target/linux/ramips/base-files/etc/board.d/02_network	(revision 45974)
+--- target/linux/ramips/base-files/etc/board.d/02_network	(revision 46893)
 +++ target/linux/ramips/base-files/etc/board.d/02_network	(working copy)
-@@ -230,6 +230,7 @@
+@@ -233,6 +233,7 @@
  		ucidef_add_switch_vlan "switch0" "2" "4 6t"
  		;;
  
@@ -621,7 +621,7 @@ Index: target/linux/ramips/base-files/etc/board.d/02_network
  	y1s)
  		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
  		ucidef_add_switch "switch0" "1" "1"
-@@ -324,6 +325,13 @@
+@@ -327,6 +328,13 @@
  		wan_mac=$(macaddr_add "$lan_mac" 1)
  		;;
  
@@ -637,9 +637,9 @@ Index: target/linux/ramips/base-files/etc/board.d/02_network
  		;;
 Index: target/linux/ramips/base-files/etc/diag.sh
 ===================================================================
---- target/linux/ramips/base-files/etc/diag.sh	(revision 45974)
+--- target/linux/ramips/base-files/etc/diag.sh	(revision 46893)
 +++ target/linux/ramips/base-files/etc/diag.sh	(working copy)
-@@ -226,6 +226,9 @@
+@@ -236,6 +236,9 @@
  	na930)
  		status_led="na930:blue:power"
  		;;

@@ -1,6 +1,6 @@
 Index: package/network/services/dnsmasq/Makefile
 ===================================================================
---- package/network/services/dnsmasq/Makefile	(revision 45974)
+--- package/network/services/dnsmasq/Makefile	(revision 46893)
 +++ package/network/services/dnsmasq/Makefile	(working copy)
 @@ -116,7 +116,7 @@
  		$(if $(CONFIG_PACKAGE_dnsmasq_$(BUILD_VARIANT)_ipset),,-DNO_IPSET)
