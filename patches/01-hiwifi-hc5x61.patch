@@ -414,7 +414,7 @@ Index: target/linux/ramips/dts/HiWiFi-HC5661A.dts
 +
 +	memory@0 {
 +		device_type = "memory";
-+		reg = <0x0 0x2000000>;
++		reg = <0x0 0x8000000>;
 +	};
 +
 +	pinctrl {
@@ -581,7 +581,7 @@ Index: target/linux/ramips/base-files/lib/upgrade/platform.sh
  	x5 |\
  	x8 |\
  	xiaomi-miwifi-mini |\
-+	hiwifi-hc5*61 | hiwifi-hc5661a \
++	hiwifi-hc5*61 | hiwifi-hc5661a |\
  	y1 |\
  	y1s |\
  	zte-q7 |\
@@ -617,7 +617,7 @@ Index: target/linux/ramips/base-files/etc/board.d/02_network
  		ucidef_add_switch_vlan "switch0" "2" "4 6t"
  		;;
  
-+	hiwifi-hc5*61 | hiwifi-hc5661a \
++	hiwifi-hc5*61 | hiwifi-hc5661a | \
  	y1s)
  		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
  		ucidef_add_switch "switch0" "1" "1"
