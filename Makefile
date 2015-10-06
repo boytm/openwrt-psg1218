@@ -6,7 +6,7 @@ host_packages = build-essential git flex gettext libncurses5-dev unzip gawk libl
 openwrt_feeds = libevent2 luci luci-app-samba xl2tpd pptpd pdnsd ntfs-3g ethtool
 ### mwan3 luci-app-mwan3
 
-CONFIG_FILENAME = config-hiwifi-hcxxxx
+CONFIG_FILENAME = config-hiwifi
 
 define CheckConfigSymlink
 	@if ! [ -e $(CONFIG_FILENAME) ]; then \
