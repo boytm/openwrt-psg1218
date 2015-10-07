@@ -1,6 +1,6 @@
 
-BUILDER ?= OpenWrt-ImageBuilder-15.05-rc2-ramips-mt7620.Linux-x86_64
-SDK ?= OpenWrt-SDK-15.05-rc2-ramips-mt7620_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
+BUILDER ?= OpenWrt-ImageBuilder-15.05-ramips-mt7620.Linux-x86_64
+SDK ?= OpenWrt-SDK-15.05-ramips-mt7620_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
 
 OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6tables-mod-nat \
 	ipset iptables-mod-conntrack-extra iptables-mod-extra iptables-mod-ipopt iwinfo \
@@ -51,7 +51,7 @@ endef
 
 define EnableWireless
 	@[ -n "$(WIFI)" ] || exit 0; \
-		F="$(1)"; openwrt-repack.sh $$F -w -o $$F.out && mv $$F.out $$F
+		F=$(shell echo $(1)); openwrt-repack.sh $$F -w -o $$F.out && mv $$F.out $$F
 endef
 
 both: HC5761 HC5861
@@ -61,14 +61,14 @@ HC5761: $(PREPARED_TARGETS)
 	make -C $(BUILDER) image PROFILE=HiWiFi-HC5761 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
 		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5761)"
-	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-ramips-*-hc5761-*-sysupgrade.bin))
+	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5761-*-sysupgrade.bin))
 
 HC5861: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
 	make -C $(BUILDER) image PROFILE=HiWiFi-HC5861 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
 		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5861)"
-	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-ramips-*-hc5861-*-sysupgrade.bin))
+	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5861-*-sysupgrade.bin))
 
 .patched:
 	cat ../patches/01-hiwifi-hc5x61.patch ../patches/12-disable-pdnsd.patch > .patching
