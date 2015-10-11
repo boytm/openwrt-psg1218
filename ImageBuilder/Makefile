@@ -17,7 +17,9 @@ OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6table
 	samba36-server terminfo zlib luci-i18n-base-zh-cn luci-i18n-commands-zh-cn \
 	luci-i18n-diag-core-zh-cn luci-i18n-firewall-zh-cn luci-i18n-qos-zh-cn luci-i18n-samba-zh-cn \
 	ppp-mod-pptp ppp-mod-pppol2tp kmod-nls-cp437 kmod-nls-iso8859-1 kmod-nls-utf8 \
-	kmod-crypto-deflate kmod-usb-ohci kmod-usb-printer kmod-nf-nathelper kmod-nf-nathelper-extra
+	kmod-crypto-deflate kmod-usb-ohci kmod-usb-printer kmod-nf-nathelper kmod-nf-nathelper-extra \
+	block-mount mountd e2fsprogs
+
 OPKG_PACKAGES_HC5761 :=
 OPKG_PACKAGES_HC5861 :=
 PREPARED_TARGETS = .check_ib .patched
@@ -54,18 +56,25 @@ define EnableWireless
 		F=$(shell echo $(1)); openwrt-repack.sh $$F -w -o $$F.out && mv $$F.out $$F
 endef
 
-both: HC5761 HC5861
+all: HC5661 HC5761 HC5861
+
+HC5661: $(PREPARED_TARGETS)
+	$(call BeforeBuildImage)
+	make -C $(BUILDER) image PROFILE=HC5661 \
+		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
+		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5761)"
+	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5661-*-sysupgrade.bin))
 
 HC5761: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
-	make -C $(BUILDER) image PROFILE=HiWiFi-HC5761 \
+	make -C $(BUILDER) image PROFILE=HC5761 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
 		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5761)"
 	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5761-*-sysupgrade.bin))
 
 HC5861: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
-	make -C $(BUILDER) image PROFILE=HiWiFi-HC5861 \
+	make -C $(BUILDER) image PROFILE=HC5861 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
 		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5861)"
 	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5861-*-sysupgrade.bin))
