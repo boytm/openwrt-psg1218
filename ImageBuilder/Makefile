@@ -22,7 +22,7 @@ OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6table
 
 OPKG_PACKAGES_HC5761 :=
 OPKG_PACKAGES_HC5861 :=
-PREPARED_TARGETS = .check_ib .patched
+PREPARED_TARGETS = $(BUILDER) $(SDK) .check_ib .patched
 
 # A single option for enabling all options
 ifeq ($(FULL),1)
@@ -120,9 +120,10 @@ HC5861: $(PREPARED_TARGETS)
 	fi
 
 # Try extracting ImageBuilder & SDK to current directory
-extract:
-	[ -d "$(BUILDER)" ] || tar jxvf /var/dl/$(BUILDER).tar.bz2
-	[ -d "$(SDK)" ] || tar jxvf /var/dl/$(SDK).tar.bz2
+$(BUILDER):
+	tar jxvf /var/dl/$(BUILDER).tar.bz2
+$(SDK):
+	tar jxvf /var/dl/$(SDK).tar.bz2
 
 help:
 	@echo "Usage:"
