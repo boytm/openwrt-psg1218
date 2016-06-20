@@ -1,24 +1,27 @@
 
-BUILDER ?= OpenWrt-ImageBuilder-15.05-ramips-mt7620.Linux-x86_64
-SDK ?= OpenWrt-SDK-15.05-ramips-mt7620_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
+BUILDER ?= OpenWrt-ImageBuilder-15.05.1-ramips-mt7620.Linux-x86_64
+SDK ?= OpenWrt-SDK-15.05.1-ramips-mt7620_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64
 
 OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6tables-mod-nat \
 	ipset iptables-mod-conntrack-extra iptables-mod-extra iptables-mod-ipopt iwinfo \
 	iptables-mod-nat-extra kmod-crypto-des kmod-crypto-ecb kmod-crypto-hmac kmod-crypto-manager \
 	kmod-crypto-md4 kmod-crypto-md5 kmod-crypto-pcompress kmod-crypto-sha1 kmod-crypto-sha256 \
-	kmod-dnsresolver kmod-fs-ext4 kmod-fs-vfat kmod-fs-cifs kmod-fuse kmod-gre kmod-ipt-filter\
+	kmod-dnsresolver kmod-fs-cifs kmod-fuse kmod-gre kmod-ipt-filter\
 	kmod-ip6-tunnel kmod-ip6tables-extra kmod-ipip kmod-ipt-conntrack-extra kmod-ipt-extra \
 	kmod-ipt-ipopt kmod-ipt-ipset kmod-ipt-nat-extra kmod-ipt-nat6 kmod-iptunnel kmod-iptunnel4 \
 	kmod-iptunnel6 kmod-leds-gpio kmod-ledtrig-default-on kmod-ledtrig-netdev kmod-lib-zlib \
-	kmod-ledtrig-timer kmod-ledtrig-usbdev kmod-lib-textsearch kmod-macvlan kmod-mppe \
-	kmod-nfnetlink kmod-pptp kmod-sit kmod-tun kmod-usb-storage libblkid libcurl libdaemon \
-	libevent2 liblzo libmnl libncurses libopenssl libpolarssl libpthread luci-app-samba \
-	luci-lib-json luci-proto-ipv6 luci-proto-relay ntfs-3g openvpn-openssl resolveip \
-	samba36-server terminfo zlib luci-i18n-base-zh-cn luci-i18n-commands-zh-cn \
-	luci-i18n-diag-core-zh-cn luci-i18n-firewall-zh-cn luci-i18n-qos-zh-cn luci-i18n-samba-zh-cn \
+	kmod-ledtrig-timer  kmod-lib-textsearch kmod-macvlan kmod-mppe \
+	kmod-nfnetlink kmod-pptp kmod-sit kmod-tun  libblkid libcurl libdaemon \
+	libevent2 liblzo libmnl libncurses libopenssl libpthread  \
+	luci-lib-json luci-proto-ipv6 luci-proto-relay openvpn-openssl resolveip \
+	terminfo zlib luci-i18n-base-zh-cn luci-i18n-commands-zh-cn \
+	luci-i18n-diag-core-zh-cn luci-i18n-firewall-zh-cn luci-i18n-qos-zh-cn  \
 	ppp-mod-pptp ppp-mod-pppol2tp kmod-nls-cp437 kmod-nls-iso8859-1 kmod-nls-utf8 \
-	kmod-crypto-deflate kmod-usb-ohci kmod-usb-printer kmod-nf-nathelper kmod-nf-nathelper-extra \
-	block-mount mountd e2fsprogs
+	kmod-crypto-deflate  kmod-nf-nathelper kmod-nf-nathelper-extra \
+	block-mount mountd luci-app-ddns ddns-scripts luci-app-upnp miniupnpd
+
+USB_PACKAGES := kmod-fs-ext4 kmod-fs-vfat kmod-usb-storage kmod-ledtrig-usbdev kmod-usb-ohci kmod-usb-printer \
+	ntfs-3g luci-app-samba luci-i18n-samba-zh-cn samba36-server e2fsprogs
 
 OPKG_PACKAGES_HC5661 :=
 OPKG_PACKAGES_HC5761 :=
@@ -36,10 +39,15 @@ ifeq ($(RALINK),1)
 	OPKG_PACKAGES_HC5761 += 8021xd uci2dat kmod-mt7610e luci-mtk-wifi
 	OPKG_PACKAGES_HC5861 += 8021xd uci2dat kmod-mt76x2e luci-mtk-wifi
 	PREPARED_TARGETS += .check_sdk .ralink
+else
+	OPKG_PACKAGES_HC5761 += kmod-mt76
+	OPKG_PACKAGES_HC5861 += kmod-mt76
+	PREPARED_TARGETS += .check_sdk .ralink
 endif
 ifeq ($(FEEDS),1)
 	OPKG_PACKAGES += ipset-lists minivtun shadowsocks-libev shadowsocks-tools dnsmasq-full \
-		file-storage dnspod-utils kmod-proto-bridge kmod-yavlan
+		dnspod-utils kmod-proto-bridge kmod-yavlan
+	USB_PACKAGES += file-storage
 	PREPARED_TARGETS += .check_sdk .feeds
 endif
 
@@ -105,6 +113,7 @@ HC5861: $(PREPARED_TARGETS)
 	make package/file-storage/compile V=s -C "$(SDK)"
 	make package/dnspod-utils/compile V=s -C "$(SDK)"
 	make package/proto-bridge/compile V=s -C "$(SDK)"
+	make package/pdnsd/compile V=s -C "$(SDK)"
 	cd "$(SDK)/bin/ramips/packages" && ../../../scripts/ipkg-make-index.sh . > Packages && gzip -9c Packages > Packages.gz
 
 .check_ib:
