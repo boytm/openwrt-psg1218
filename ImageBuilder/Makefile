@@ -6,7 +6,7 @@ OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6table
 	ipset iptables-mod-conntrack-extra iptables-mod-extra iptables-mod-ipopt iwinfo \
 	iptables-mod-nat-extra kmod-crypto-des kmod-crypto-ecb kmod-crypto-hmac kmod-crypto-manager \
 	kmod-crypto-md4 kmod-crypto-md5 kmod-crypto-pcompress kmod-crypto-sha1 kmod-crypto-sha256 \
-	kmod-dnsresolver kmod-fs-cifs kmod-fuse kmod-gre kmod-ipt-filter\
+	kmod-dnsresolver kmod-fs-cifs kmod-gre kmod-ipt-filter\
 	kmod-ip6-tunnel kmod-ip6tables-extra kmod-ipip kmod-ipt-conntrack-extra kmod-ipt-extra \
 	kmod-ipt-ipopt kmod-ipt-ipset kmod-ipt-nat-extra kmod-ipt-nat6 kmod-iptunnel kmod-iptunnel4 \
 	kmod-iptunnel6 kmod-leds-gpio kmod-ledtrig-default-on kmod-ledtrig-netdev kmod-lib-zlib \
@@ -18,10 +18,10 @@ OPKG_PACKAGES :=  6in4 6to4 blkid curl ethtool fdisk ip ip6tables-extra ip6table
 	luci-i18n-diag-core-zh-cn luci-i18n-firewall-zh-cn luci-i18n-qos-zh-cn  \
 	ppp-mod-pptp ppp-mod-pppol2tp kmod-nls-cp437 kmod-nls-iso8859-1 kmod-nls-utf8 \
 	kmod-crypto-deflate  kmod-nf-nathelper kmod-nf-nathelper-extra \
-	block-mount mountd luci-app-ddns ddns-scripts luci-app-upnp miniupnpd
+	block-mount luci-app-ddns ddns-scripts luci-app-upnp miniupnpd luci-app-mwan3 mwan3
 
-USB_PACKAGES := kmod-fs-ext4 kmod-fs-vfat kmod-usb-storage kmod-ledtrig-usbdev kmod-usb-ohci kmod-usb-printer \
-	ntfs-3g luci-app-samba luci-i18n-samba-zh-cn samba36-server e2fsprogs
+USB_PACKAGES := kmod-fuse kmod-fs-ext4 kmod-fs-vfat kmod-usb-storage kmod-ledtrig-usbdev kmod-usb-ohci kmod-usb-printer \
+	ntfs-3g luci-app-samba luci-i18n-samba-zh-cn samba36-server e2fsprogs mountd 
 
 OPKG_PACKAGES_HC5661 :=
 OPKG_PACKAGES_HC5761 :=
@@ -65,28 +65,37 @@ define EnableWireless
 		F=$(shell echo $(1)); openwrt-repack.sh $$F -w -o $$F.out && mv $$F.out $$F
 endef
 
-all: HC5661 HC5761 HC5861
+all: HC5661 HC5761 HC5861 XIAOMI-MIWIFI-MINI
 
 HC5661: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
+	cp ../patches/GEHUA.dts  OpenWrt-ImageBuilder-15.05.1-ramips-mt7620.Linux-x86_64/target/linux/ramips/dts/HC5661.dts
 	make -C $(BUILDER) image PROFILE=HC5661 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
-		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5661)"
+		PACKAGES="$(OPKG_PACKAGES) $(USB_PACKAGES) $(OPKG_PACKAGES_HC5661)"
 	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5661-*-sysupgrade.bin))
 
 HC5761: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
 	make -C $(BUILDER) image PROFILE=HC5761 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
-		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5761)"
+		PACKAGES="$(OPKG_PACKAGES) $(USB_PACKAGES) $(OPKG_PACKAGES_HC5761)"
 	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5761-*-sysupgrade.bin))
 
 HC5861: $(PREPARED_TARGETS)
 	$(call BeforeBuildImage)
 	make -C $(BUILDER) image PROFILE=HC5861 \
 		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
-		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5861)"
+		PACKAGES="$(OPKG_PACKAGES) $(USB_PACKAGES) $(OPKG_PACKAGES_HC5861)"
 	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-hc5861-*-sysupgrade.bin))
+
+XIAOMI-MIWIFI-MINI: $(PREPARED_TARGETS)
+	$(call BeforeBuildImage)
+	cp ../patches/PSG1218.dts  OpenWrt-ImageBuilder-15.05.1-ramips-mt7620.Linux-x86_64/target/linux/ramips/dts/XIAOMI-MIWIFI-MINI.dts
+	make -C $(BUILDER) image PROFILE=XIAOMI-MIWIFI-MINI \
+		FILES="$(shell cd $(BUILDER); pwd)/target/linux/ramips/base-files" \
+		PACKAGES="$(OPKG_PACKAGES) $(OPKG_PACKAGES_HC5761)"
+	$(call EnableWireless,$(shell echo $(BUILDER)/bin/ramips/openwrt-*-xiaomi-miwifi-mini-*-sysupgrade.bin))
 
 .patched:
 	cat ../patches/01-hiwifi-hc5x61.patch ../patches/12-disable-pdnsd.patch > .patching
@@ -114,6 +123,7 @@ HC5861: $(PREPARED_TARGETS)
 	make package/dnspod-utils/compile V=s -C "$(SDK)"
 	make package/proto-bridge/compile V=s -C "$(SDK)"
 	make package/pdnsd/compile V=s -C "$(SDK)"
+	make package/mproxy/compile V=s -C "$(SDK)"
 	cd "$(SDK)/bin/ramips/packages" && ../../../scripts/ipkg-make-index.sh . > Packages && gzip -9c Packages > Packages.gz
 
 .check_ib:
