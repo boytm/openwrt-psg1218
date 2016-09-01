@@ -11,6 +11,18 @@
                         status = "okay";
                 };
 
+		gpio1: gpio@638 {
+			status = "okay";
+		};
+
+		gpio2: gpio@660 {
+			status = "okay";
+		};
+
+		gpio3: gpio@688 {
+			status = "okay";
+		};
+
                 spi@b00 {
                         status = "okay";
 
@@ -56,8 +68,6 @@
         };
 
         ethernet@10100000 {
-                pinctrl-names = "default";
-                pinctrl-0 = <&ephy_pins>;
                 mtd-mac-address = <&factory 0x28>;
                 ralink,port-map = "llllw";
         };
@@ -82,7 +92,7 @@
         pinctrl {
                 state_default: pinctrl0 {
                         gpio {
-                                ralink,group = "i2c", "uartf";
+                                ralink,group = "i2c", "uartf", "uartlite", "wdt", "mdio", "rgmii1", "spi refclk", "nd_sd", "rgmii2", "wled", "ephy";
                                 ralink,function = "gpio";
                         };
 
