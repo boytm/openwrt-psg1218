@@ -3,8 +3,8 @@
 /include/ "mt7620a.dtsi"
 
 / {
-    compatible = "HC5661", "ralink,mt7620a-soc";
-    model = "HiWiFi HC5661";
+    compatible = "GEHUA", "ralink,mt7620a-soc";
+    model = "GEHUA";
 
 	chosen {
 		bootargs = "console=ttyS0,57600";
@@ -107,22 +107,22 @@
 		compatible = "gpio-leds";
 
 		system {
-	            label = "hc5661:yellow:system";
+	            label = "gehua:yellow:system";
                     gpios = <&gpio2 0 1>;
 		};
 	 
 		internet {
-		    label = "hc5661:green:internet";
+		    label = "gehua:green:internet";
 		    gpios = <&gpio2 1 1>;
 		};
 	 
 		wlan2g {
-		    label = "hc5661:yellow:wlan2g";
+		    label = "gehua:yellow:wlan2g";
 		    gpios = <&gpio2 2 1>;
 		};
 	 
 		wlan2g_green {
-		    label = "hc5661:green:wlan2g";
+		    label = "gehua:green:wlan2g";
 		    gpios = <&gpio2 3 1>;
 		};
 	};

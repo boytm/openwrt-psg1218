@@ -2,7 +2,7 @@ Index: target/linux/ramips/base-files/etc/board.d/01_leds
 ===================================================================
 --- target/linux/ramips/base-files/etc/board.d/01_leds	(revision 46893)
 +++ target/linux/ramips/base-files/etc/board.d/01_leds	(working copy)
-@@ -243,6 +243,29 @@
+@@ -243,6 +243,37 @@
  		set_usb_led "wr8305rt:usb"
  		set_wifi_led "wr8305rt:wifi"
  		;;
@@ -29,6 +29,14 @@ Index: target/linux/ramips/base-files/etc/board.d/01_leds
 +		ucidef_set_led_netdev "internet" "internet" "hc5661a:blue:internet" "eth0.2"
 +		set_wifi_led "hc5661a:blue:wlan2g"
 +		;;
++        psg1218)
++                ucidef_set_led_netdev "internet" "internet" "phicomm:blue:status" "eth0.2"
++                ;;
++	gehua)
++		ucidef_set_led_default "system" "system" "gehua:yellow:system" "1"
++		ucidef_set_led_netdev "internet" "internet" "gehua:green:internet" "eth0.2"
++		set_wifi_led "gehua:green:wlan2g"
++		;;	
  	wt1520)
  		set_wifi_led "rt2800pci-phy0::radio"
  		;;
@@ -36,16 +44,25 @@ Index: target/linux/ramips/base-files/etc/board.d/02_network
 ===================================================================
 --- target/linux/ramips/base-files/etc/board.d/02_network	(revision 46893)
 +++ target/linux/ramips/base-files/etc/board.d/02_network	(working copy)
-@@ -233,6 +233,8 @@
+@@ -145,6 +145,7 @@
+ 	wsr-1166 | \
+ 	wt1520 | \
+ 	xiaomi-miwifi-mini |\
++	psg1218 |\
+ 	y1|\
+ 	zbt-wg2626)
+ 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
+@@ -241,6 +242,9 @@
  		ucidef_add_switch_vlan "switch0" "2" "4 6t"
  		;;
  
 +	hc5*61 | \
 +	hc5661a | \
++	gehua | \
  	y1s)
  		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
  		ucidef_add_switch "switch0" "1" "1"
-@@ -283,6 +285,13 @@
+@@ -291,6 +295,13 @@
  		wan_mac=$(mtd_get_mac_binary devdata 7)
  		;;
  
@@ -63,7 +80,7 @@ Index: target/linux/ramips/base-files/etc/diag.sh
 ===================================================================
 --- target/linux/ramips/base-files/etc/diag.sh	(revision 46893)
 +++ target/linux/ramips/base-files/etc/diag.sh	(working copy)
-@@ -69,6 +69,18 @@
+@@ -69,6 +69,24 @@
  	fonera20n)
  		status_led="fonera20n:green:power"
  		;;
@@ -79,6 +96,12 @@ Index: target/linux/ramips/base-files/etc/diag.sh
 +	hc5661a)
 +		status_led="hc5661a:blue:system"
 +		;;
++	psg1218)
++		status_led="phicomm:yellow:status"
++		;;
++	gehua)
++		status_led="gehua:yellow:system"
++		;;
  	ip2202)
  		status_led="ip2202:green:run"
  		;;
@@ -86,7 +109,7 @@ Index: target/linux/ramips/base-files/lib/ramips.sh
 ===================================================================
 --- target/linux/ramips/base-files/lib/ramips.sh	(revision 46893)
 +++ target/linux/ramips/base-files/lib/ramips.sh	(working copy)
-@@ -172,6 +172,18 @@
+@@ -172,6 +172,24 @@
  	*"Hauppauge Broadway")
  		name="broadway"
  		;;
@@ -102,6 +125,12 @@ Index: target/linux/ramips/base-files/lib/ramips.sh
 +	*"HC5661A")
 +		name="hc5661a"
 +		;;
++	*"PSG1218")
++		name="psg1218"
++		;;
++	*"gehua")
++		name="gehua"
++		;;
  	*"Huawei D105")
  		name="d105"
  		;;
@@ -109,12 +138,14 @@ Index: target/linux/ramips/base-files/lib/upgrade/platform.sh
 ===================================================================
 --- target/linux/ramips/base-files/lib/upgrade/platform.sh	(revision 46893)
 +++ target/linux/ramips/base-files/lib/upgrade/platform.sh	(working copy)
-@@ -56,6 +56,8 @@
+@@ -56,6 +56,10 @@
  	firewrt |\
  	pbr-m1 |\
  	hg255d | \
 +	hc5*61 | \
 +	hc5661a | \
++	psg1218 | \
++	gehua | \
  	hlk-rm04 | \
  	ht-tm02 | \
  	hw550-3g | \
@@ -522,7 +553,7 @@ Index: target/linux/ramips/image/Makefile
 ===================================================================
 --- target/linux/ramips/image/Makefile	(revision 46893)
 +++ target/linux/ramips/image/Makefile	(working copy)
-@@ -866,6 +866,10 @@
+@@ -873,6 +873,10 @@
  na930_mtd_size=20971520
  Image/Build/Profile/NA930=$(call BuildFirmware/CustomFlash/$(1),$(1),na930,NA930,$(na930_mtd_size))
  Image/Build/Profile/MZK-750DHP=$(call BuildFirmware/Default8M/$(1),$(1),mzk-750dhp,MZK-750DHP)
@@ -533,7 +564,16 @@ Index: target/linux/ramips/image/Makefile
  Image/Build/Profile/Y1=$(call BuildFirmware/Default16M/$(1),$(1),Lenovo-y1,Y1)
  Image/Build/Profile/Y1S=$(call BuildFirmware/Default16M/$(1),$(1),Lenovo-y1s,Y1S)
  Image/Build/Profile/MLW221=$(call BuildFirmware/Default16M/$(1),$(1),mlw221,MLW221)
-@@ -899,6 +903,10 @@
+@@ -885,6 +889,8 @@
+ Image/Build/Profile/XIAOMI-MIWIFI-MINI=$(call BuildFirmware/Default16M/$(1),$(1),xiaomi-miwifi-mini,XIAOMI-MIWIFI-MINI)
+ Image/Build/Profile/ZTE-Q7=$(call BuildFirmware/Default8M/$(1),$(1),zte-q7,ZTE-Q7)
+ Image/Build/Profile/ZBT-WA05=$(call BuildFirmware/Default8M/$(1),$(1),zbt-wa05,ZBT-WA05)
++Image/Build/Profile/PSG1218=$(call BuildFirmware/Default8M/$(1),$(1),psg1218,PSG1218)
++Image/Build/Profile/GEHUA=$(call BuildFirmware/Default32M/$(1),$(1),gehua,GEHUA)
+ Image/Build/Profile/ArcherC20i=$(call BuildFirmware/Tplink/$(1),$(1),ArcherC20i,ArcherC20i)
+ microwrt_mtd_size=16515072
+ Image/Build/Profile/MicroWRT=$(call BuildFirmware/CustomFlash/$(1),$(1),microwrt,MicroWRT,$(microwrt_mtd_size))
+@@ -906,6 +912,12 @@
  	$(call Image/Build/Profile/WHR1166D,$(1))
  	$(call Image/Build/Profile/MZK-750DHP,$(1))
  	$(call Image/Build/Profile/NA930,$(1))
@@ -541,9 +581,33 @@ Index: target/linux/ramips/image/Makefile
 +	$(call Image/Build/Profile/HC5761,$(1))
 +	$(call Image/Build/Profile/HC5861,$(1))
 +	$(call Image/Build/Profile/HC5661A,$(1))
++	$(call Image/Build/Profile/PSG1218,$(1))
++	$(call Image/Build/Profile/GEHUA,$(1))
  	$(call Image/Build/Profile/Y1,$(1))
  	$(call Image/Build/Profile/Y1S,$(1))
  	$(call Image/Build/Profile/MLW221,$(1))
+Index: target/linux/ramips/mt7620/profiles/gehua.mk
+===================================================================
+--- target/linux/ramips/mt7620/profiles/gehua.mk	(revision 0)
++++ target/linux/ramips/mt7620/profiles/gehua.mk	(revision 0)
+@@ -0,0 +1,17 @@
++#
++# Copyright (C) 2015 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++
++define Profile/GEHUA
++ NAME:=Sichuan Gehua
++ PACKAGES:=\
++	kmod-usb-core kmod-usb-dwc2 kmod-usb2 kmod-usb-ohci
++endef
++
++define Profile/GEHUA/Description
++ Support for SICHUAN GEHUA routers
++endef
++$(eval $(call Profile,GEHUA))
 Index: target/linux/ramips/mt7620/profiles/hiwifi.mk
 ===================================================================
 --- target/linux/ramips/mt7620/profiles/hiwifi.mk	(revision 0)
@@ -596,6 +660,28 @@ Index: target/linux/ramips/mt7620/profiles/hiwifi.mk
 +	Support HiWiFi HC5861 model(J3)
 +endef
 +$(eval $(call Profile,HC5861))
+Index: target/linux/ramips/mt7620/profiles/psg1218.mk
+===================================================================
+--- target/linux/ramips/mt7620/profiles/psg1218.mk	(revision 0)
++++ target/linux/ramips/mt7620/profiles/psg1218.mk	(revision 0)
+@@ -0,0 +1,17 @@
++#
++# Copyright (C) 2015 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++
++define Profile/PSG1218
++ NAME:=Phicomm PSG1218/K2
++ PACKAGES:=\
++	kmod-mt76
++endef
++
++define Profile/PSG1218/Description
++ Support for Phicomm PSG1218/K2 routers
++endef
++$(eval $(call Profile,PSG1218))
 Index: target/linux/ramips/mt7628/profiles/hiwifi.mk
 ===================================================================
 --- target/linux/ramips/mt7628/profiles/hiwifi.mk	(revision 0)
