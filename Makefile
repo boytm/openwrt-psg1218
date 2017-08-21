@@ -3,9 +3,9 @@
 hiwifi_root = $(shell pwd)
 openwrt_dir = openwrt-ramips
 host_packages = build-essential git flex gettext libncurses5-dev unzip gawk liblzma-dev u-boot-tools
-openwrt_feeds = libevent2 luci luci-app-samba xl2tpd pptpd pdnsd ntfs-3g ethtool
+openwrt_feeds = libevent2 luci luci-app-samba luci-app-ddns luci-app-upnp xl2tpd pptpd pdnsd ntfs-3g ethtool
 ### mwan3 luci-app-mwan3
-CONFIG_FILENAME = config-hiwifi
+CONFIG_FILENAME = config-gehua
 
 RUNNING_THREADS := $(shell cat /proc/cpuinfo | grep -i '^processor\s\+:' | wc -l)
 
@@ -34,7 +34,7 @@ recovery.bin: HC5X61
 	@cd $(openwrt_dir); ./scripts/feeds install $(openwrt_feeds);
 	@cd $(openwrt_dir)/package; \
 	 [ -e rssnsj-packages ] || ln -s ../../packages rssnsj-packages; \
-	 [ -e rssnsj-feeds ] || git clone https://github.com/rssnsj/network-feeds.git rssnsj-feeds
+	 [ -e rssnsj-feeds ] || git clone https://github.com/boytm/network-feeds.git rssnsj-feeds
 	@touch .install_feeds
 
 .update_feeds: .patched
@@ -44,12 +44,15 @@ recovery.bin: HC5X61
 .patched: .checkout_svn
 	$(call CheckConfigSymlink)
 	@cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config
+	cp patches/*.dts $(openwrt_dir)/target/linux/ramips/dts/
+	cp patches/kernel/*.patch $(openwrt_dir)/target/linux/ramips/patches-3.18/
 	@cd $(openwrt_dir); cat ../patches/*.patch | patch -p0
 	@touch .patched
 
 # 2. Checkout source code:
 .checkout_svn: .check_hostdeps
-	svn co svn://svn.openwrt.org/openwrt/branches/chaos_calmer $(openwrt_dir) -r46893
+	#svn co svn://svn.openwrt.org/openwrt/branches/chaos_calmer $(openwrt_dir) -r46893
+	git clone -b v15.05.1 --depth 10  https://github.com/openwrt/openwrt.git $(openwrt_dir)
 	@[ -d /var/dl ] && ln -sf /var/dl $(openwrt_dir)/dl || :
 	@touch .checkout_svn
 
