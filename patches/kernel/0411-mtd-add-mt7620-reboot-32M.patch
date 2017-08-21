@@ -1,0 +1,34 @@
+--- a/drivers/mtd/devices/m25p80.c	2015-10-29 10:49:46.000000000 +0800
++++ b/drivers/mtd/devices/m25p80.c	2017-08-21 17:23:15.028274486 +0800
+@@ -260,6 +326,23 @@
+ 	return mtd_device_unregister(&flash->mtd);
+ }
+ 
++static void m25p_reboot(struct spi_device *spi)
++{
++	struct m25p	*flash = spi_get_drvdata(spi);
++
++	// Winbond W25Q256 soft reset
++	//flash->command[0] = 0x66;  // enable reset
++	//spi_write(flash->spi, flash->command, 1);  
++	//flash->command[0] = 0x99;  // reset
++	//spi_write(flash->spi, flash->command, 1);  
++
++	// Macronix and Winbond, exit 4 byte mode
++	if (flash->mtd.size > 0x1000000) {
++		flash->command[0] = SPINOR_OP_EX4B; 
++		spi_write(flash->spi, flash->command, 1);  
++	}
++}
++
+ 
+ /*
+  * XXX This needs to be kept in sync with spi_nor_ids.  We can't share
+@@ -319,6 +402,7 @@
+ 	.id_table	= m25p_ids,
+ 	.probe	= m25p_probe,
+ 	.remove	= m25p_remove,
++	.shutdown = m25p_reboot,  
+ 
+ 	/* REVISIT: many of these chips have deep power-down modes, which
+ 	 * should clearly be entered on suspend() to minimize power use.
