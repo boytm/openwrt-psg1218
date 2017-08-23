@@ -128,7 +128,7 @@ Index: target/linux/ramips/base-files/lib/ramips.sh
 +	*"PSG1218")
 +		name="psg1218"
 +		;;
-+	*"gehua")
++	*"GEHUA")
 +		name="gehua"
 +		;;
  	*"Huawei D105")
