@@ -46,6 +46,7 @@ recovery.bin: HC5X61
 	@cp -vf $(CONFIG_FILENAME) $(openwrt_dir)/.config
 	cp patches/*.dts $(openwrt_dir)/target/linux/ramips/dts/
 	cp patches/kernel/*.patch $(openwrt_dir)/target/linux/ramips/patches-3.18/
+	cp patches/mac80211/*.patch $(openwrt_dir)/package/kernel/mac80211/patches/
 	@cd $(openwrt_dir); cat ../patches/*.patch | patch -p0
 	@touch .patched
 
