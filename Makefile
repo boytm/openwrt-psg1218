@@ -3,7 +3,7 @@
 hiwifi_root = $(shell pwd)
 openwrt_dir = openwrt-ramips
 host_packages = build-essential git flex gettext libncurses5-dev unzip gawk liblzma-dev u-boot-tools
-openwrt_feeds = libevent2 luci luci-app-samba luci-app-ddns luci-app-upnp xl2tpd pptpd pdnsd ntfs-3g ethtool
+openwrt_feeds = libevent2 luci luci-i18n-base-zh-cn luci-app-samba luci-app-ddns luci-app-upnp xl2tpd pptpd pdnsd ntfs-3g ethtool
 ### mwan3 luci-app-mwan3
 CONFIG_FILENAME = config-gehua
 
